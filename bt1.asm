@@ -5,7 +5,7 @@
     MSG1   DB 13, 10, 'NHAP VAO CHUOI: $'       
     MSG2   DB 13, 10, 'CHUOI DAU RA: $'
 
-    buffer DB 100, ?, 100 DUP(' ')    
+    buffer DB 100, ?, 100 DUP(' ')    ; khai báo 1 mảng trống có tối đa 100 phần tử
 
 .CODE
 MAIN Proc
@@ -18,7 +18,7 @@ MAIN Proc
     LEA DX, MSG1
     INT 21h
 
-    ; G?I CHUONG TR�NH CON NHAP
+    ; GoI CHUONG TRÌNH CON NHAP
     CALL NHAP
 
     ; HIEN THONG BAO "CHUOI DAU RA:"
@@ -26,7 +26,7 @@ MAIN Proc
     LEA DX, MSG2
     INT 21h
 
-    ; G?I CHUONG TR�NH CON XUAT
+    ; GoI CHUONG TRÌNH CON XUAT
     CALL XUAT
 
     ; KET THUC CHUONG TRINH
@@ -34,16 +34,14 @@ MAIN Proc
     INT 21h  
     
 MAIN ENDP
-
-
-NHAP Proc
+NHAP Proc ; Chương trình con nhập
     MOV DX, OFFSET buffer
     MOV AH, 0Ah
     INT 21h
     RET
 NHAP ENDP
 
-XUAT PROC
+XUAT PROC  ; Chương trình con xuất
     XOR BX, BX
     MOV BL, buffer[1]            
     MOV buffer[BX+2], '$'        

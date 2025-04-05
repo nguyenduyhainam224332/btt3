@@ -2,18 +2,18 @@
 .STACK 100h
 
 .DATA
-    MSG1   DB 13, 10, 'NHAP VAO CHUOI: $'       
-    MSG2   DB 13, 10, 'CHUOI DAU RA: $'  
-    MSG3   DB 13, 10, 'SAP XEP VA NEU RA TAN SO XUAT HIEN CUA KI TU TRONG MA ASCII: $'
-    buffer DB 100, ?, 100 DUP(' ')    
-    newline DB 13,10,"$" 
-    sorted_str DB 100 DUP('$')   
-    freq_table DB 128 DUP(0)  
-    pos_buffer DB 512 DUP('$')
-    dash DB "-$"
-    comma DB ", $"
-    stat_format DB " -- $" 
-    slash DB "/$" 
+    MSG1   DB 13, 10, 'NHAP VAO CHUOI: $'       ; Thông báo nhập chuỗi
+    MSG2   DB 13, 10, 'CHUOI DAU RA: $'  ; Thông báo hiển thị chuỗi sau khi nhập
+    MSG3   DB 13, 10, 'SAP XEP VA NEU RA TAN SO XUAT HIEN CUA KI TU TRONG MA ASCII: $' ; Thông báo hiển thị chuỗi đã sắp xếp và tần suất của ký tự
+    buffer DB 100, ?, 100 DUP(' ')    ; Bộ đệm chứa chuỗi nhập vào
+    newline DB 13,10,"$"   ; Ký tự xuống dòng
+    sorted_str DB 100 DUP('$')   ; Mảng chứa chuỗi đã sắp xếp
+    freq_table DB 128 DUP(0)  ; Mảng lưu trữ tần suất của các ký tự
+    dash DB "-$"     ; Dấu "–" để hiển thị giữa ký tự và tần suất
+    comma DB ", $"   ; Dấu "," để phân cách giữa các vị trí
+    stat_format DB " -- $"  ; Định dạng cho tần suất
+    slash DB "/$"   ; Dấu "/" cho định dạng
+
     
 .CODE
 MAIN PROC
@@ -30,7 +30,7 @@ MAIN PROC
     INT 21H
 MAIN ENDP
 
-NHAP PROC
+NHAP PROC    ;Nhập chuỗi từ người dùng và lưu vào buffer. Sau đó lấy độ dài của chuỗi.
     MOV AH, 09H
     LEA DX, msg1
     INT 21H
@@ -44,7 +44,7 @@ NHAP PROC
     RET
 NHAP ENDP
 
-XUAT PROC
+XUAT PROC    ;Hiển thị chuỗi vừa nhập ra màn hình.
     MOV AH, 09H
     LEA DX, msg2
     INT 21H
@@ -59,7 +59,7 @@ XUAT PROC
     RET
 XUAT ENDP
 
-TANXUAT PROC
+TANXUAT PROC    ;Tính toán tần suất của các ký tự trong chuỗi và hiển thị tần suất của từng ký tự.
     PUSH AX
     PUSH BX
     PUSH CX
@@ -156,7 +156,7 @@ NEXT_CHAR:
     RET
 TANXUAT ENDP
 
-SAPXEP PROC
+SAPXEP PROC    ;Sắp xếp chuỗi theo thứ tự ASCII.
     PUSH AX
     PUSH BX
     PUSH CX
@@ -215,7 +215,7 @@ SORT_DONE:
     RET
 SAPXEP ENDP
 
-SAPXEP2 PROC
+SAPXEP2 PROC            ;In chuỗi đã sắp xếp với tần suất xuất hiện của mỗi ký tự kèm theo dấu - giữa ký tự và tần suất.
     PUSH AX
     PUSH BX
     PUSH CX
@@ -267,7 +267,7 @@ NEXT_FREQ_CHAR:
     RET
 SAPXEP2 ENDP
 
-InGiaTri PROC
+InGiaTri PROC        ;In số lần xuất hiện của ký tự hoặc tần suất vào màn hình.
     PUSH AX
     PUSH BX
     PUSH CX

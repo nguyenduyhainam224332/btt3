@@ -8,7 +8,7 @@
     buffer DB 100, ?, 100 DUP(' ')    
     MSG4   DB " VI TRI: $"
     MSG5   DB "$"   
-    newline DB 13,10,"$"
+    newline DB 13,10,"$"           ; Khai báo biến newline, khi xác định hết 1 kí tự sẽ chèn thêm $ vào cuối
 .CODE
 MAIN Proc
     ; LAY SEGMENT DATA VAO DS
@@ -62,44 +62,41 @@ XUAT PROC
     RET
 XUAT ENDP  
 
-PHANBIET PROC
-    
-    
-    LEA SI, buffer + 2  
-    MOV CX, 1           
+PHANBIET PROC ; Chương trình phân biệt giữa số và chữ cái
+    LEA SI, buffer + 2  ; SI trỏ đến vị trí bắt đầu chuỗi nhập
+    MOV CX, 1           ; CX dùng để duyệt qua từng ký tự trong chuỗi          
 
 SCAN_LOOP:
-    MOV AL, [SI]        
-    CMP AL, 0DH         
-    JE DONE              
+    MOV AL, [SI]        ; Lấy ký tự từ chuỗi
+    CMP AL, 0DH         ; So sánh với ký tự xuống dòng (kết thúc chuỗi)
+    JE DONE              ; Nếu gặp ký tự xuống dòng thì kết thúc
     
-    CMP AL, '0'         
-    JL NEXT              
-    CMP AL, '9'         
-    JG NEXT              
+    CMP AL, '0'         ; Kiểm tra nếu là chữ số
+    JL NEXT              ; Nếu nhỏ hơn '0', không phải chữ số, bỏ qua
+    CMP AL, '9'         ; Kiểm tra nếu là chữ số (<= '9')
+    JG NEXT              ; Nếu lớn hơn '9', không phải chữ số, bỏ qua  
 
-    CALL XuatGiaTri       
+    CALL XuatGiaTri       ; Nếu là chữ số, in ra ký tự
     PUSH CX
-    CALL XuatViTri   
+    CALL XuatViTri       ; In vị trí của ký tự
     POP CX
 
 NEXT:
-    INC CX               
-    INC SI               
-    JMP SCAN_LOOP        
-
+    INC CX               ; Tăng chỉ số ký tự
+    INC SI               ; Di chuyển đến ký tự tiếp theo
+    JMP SCAN_LOOP        ; Lặp lại
 DONE:
     RET
 PHANBIET ENDP
 
-XuatGiaTri PROC
+XuatGiaTri PROC          ; Hàm xuất giá trị
     MOV AH, 02H
     MOV DL, AL
     INT 21H
     RET
 XuatGiaTri ENDP
 
-XuatViTri PROC
+XuatViTri PROC            ; Hàm chỉ ra vị trí của kí tự trong chuỗi
     MOV AH, 09H
     LEA DX, MSG4  
     INT 21H
@@ -109,7 +106,7 @@ XuatViTri PROC
     PUSH CX
     PUSH DX
     MOV AX, CX    
-    CALL PrintNumber
+    CALL InGiaTri
     POP DX
     POP CX
     POP BX
@@ -125,7 +122,7 @@ XuatViTri PROC
     RET
 XuatViTri ENDP
 
-PrintNumber PROC
+InGiaTri PROC        ; Hàm in ra các số
     PUSH AX
     PUSH BX
     PUSH CX
@@ -133,27 +130,27 @@ PrintNumber PROC
     MOV BX, 10
     MOV CX, 0
 
-PrintNumberLoop:
+InSoLanLap:
     MOV DX, 0
     DIV BX
     ADD DL, '0'
     PUSH DX
     INC CX
     TEST AX, AX
-    JNZ PrintNumberLoop
+    JNZ InSoLanLap
 
-PrintDigits:
+InSo:
     POP DX
     MOV AH, 02H
     INT 21H
-    LOOP PrintDigits
+    LOOP InSo
 
     POP DX
     POP CX
     POP BX
     POP AX
     RET
-PrintNumber ENDP
+InGiaTri ENDP
 
 END MAIN
 

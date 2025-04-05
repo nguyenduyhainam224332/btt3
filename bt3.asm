@@ -16,44 +16,36 @@ MAIN Proc
     ; LAY SEGMENT DATA VAO DS
     MOV AX, @DATA
     MOV DS, AX
-
     ; HIEN THONG BAO "NHAP VAO CHUOI:"
     MOV AH, 9
     LEA DX, MSG1
     INT 21h
-
-    
     CALL NHAP
-
     ; HIEN THONG BAO "CHUOI DAU RA:"
     MOV AH, 9
     LEA DX, MSG2
     INT 21h
-
-  
     CALL XUAT
     ; HIEN THONG BAO "SO CHU SO TRONG CHUOI:"
+
     MOV AH, 9
     LEA DX, MSG3
     INT 21h
-    
-    
     CALL Frequency
+
     ; KET THUC CHUONG TRINH
     MOV AH, 4Ch
     INT 21h  
     
 MAIN ENDP
-
-
-NHAP Proc
+NHAP Proc    ;Hàm nhập 
     MOV DX, OFFSET buffer
     MOV AH, 0Ah
     INT 21h
     RET
 NHAP ENDP
 
-XUAT PROC
+XUAT PROC    ;Hàm xuất
     XOR BX, BX
     MOV BL, buffer[1]            
     MOV buffer[BX+2], '$'        
@@ -65,7 +57,7 @@ XUAT PROC
 XUAT ENDP  
 
 Frequency PROC
-    PUSH AX
+    PUSH AX     ; lưu trạng thái các thanh ghi vào trong ngăn xếp
     PUSH BX
     PUSH CX
     PUSH DX
@@ -74,42 +66,40 @@ Frequency PROC
 
     
     LEA DI, freq_table
-    MOV CX, 128         
-    XOR AL, AL          
-    REP STOSB           
+       MOV CX, 128        ; Duyệt qua tất cả 128 ký tự ASCII
+    XOR AL, AL         ; Khởi tạo AL = 0 (số lần xuất hiện ban đầu của các ký tự)
+    REP STOSB          ; Lặp qua mảng freq_table để khởi tạo tất cả giá trị bằng 0  
 
     
     LEA SI, buffer + 2  
 COUNT_LOOP:
-    MOV AL, [SI]        
-    CMP AL, 0DH         
-    JE COUNT_DONE       
-
+    MOV AL, [SI]       ; Lấy ký tự trong chuỗi
+    CMP AL, 0DH        ; Kiểm tra xem có phải ký tự kết thúc chuỗi không (0Dh là mã ASCII của dấu xuống dòng)
+    JE COUNT_DONE      ; Nếu là ký tự kết thúc chuỗi, thoát vòng lặp
     
-    CMP AL, ' '        
+    CMP AL, ' '        ; So sánh kí tự với khoảng trắng, nếu kí tự là khoảng trắng, bỏ qua nó
     JE NEXT_CHAR       
     
-    CMP AL, '$'
+    CMP AL, '$'        ; So sánh kí tự với $, nếu kí tự là $, bỏ qua nó
     JE NEXT_CHAR
     
-    XOR AH, AH          
+    XOR AH, AH         ; Xóa giá trị AH
     LEA DI, freq_table
-    ADD DI, AX          
-    INC BYTE PTR [DI]   
+    ADD DI, AX         ; Di chuyển đến vị trí của ký tự trong mảng `freq_table` (mỗi chỉ số là một ký tự ASCII)
+    INC BYTE PTR [DI]  ; Tăng tần suất xuất hiện của ký tự này
     INC SI
     JMP COUNT_LOOP
-
 COUNT_DONE:
-    
+    ; Đặt lại chỉ số ASCII để bắt đầu hiển thị thống kê
     MOV CX, 0           
 SHOW_STAT:
     LEA DI, freq_table
-    ADD DI, CX          
-    CMP BYTE PTR [DI], 0 
+    ADD DI, CX             ; Di chuyển đến vị trí trong mảng freq_table tương ứng với ký tự có mã ASCII = CX
+    CMP BYTE PTR [DI], 0   ; Nếu tần suất là 0, bỏ qua ký tự này
     JE NEXT_CHAR        
 
     MOV AH, 02H
-    MOV DL, CL
+    MOV DL, CL             ; In ký tự ra màn hình
     INT 21H
 
     MOV AH, 09H
@@ -133,7 +123,7 @@ SHOW_STAT:
 
 
     PUSH CX
-    LEA SI, buffer + 2  
+    LEA SI, buffer + 2      ; Duyệt qua chuỗi để in vị trí các ký tự
     MOV DI, 1           
 FIND_POS:
     MOV AL, [SI]

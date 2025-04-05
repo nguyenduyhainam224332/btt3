@@ -59,22 +59,22 @@ SAPXEP PROC
     PUSH SI
     PUSH DI
 
-    
+    ; Khởi tạo chuỗi sorted_str bằng dấu '$' để đảm bảo có ký tự kết thúc chuỗi
     LEA DI, sorted_str
     MOV CX, 50
     MOV AL, '$'
     REP STOSB
 
-    
+    ; Sao chép chuỗi từ buffer vào sorted_str (bỏ qua dấu cách)
     LEA SI, buffer + 2
     LEA DI, sorted_str
     XOR CX, CX
 COPY_LOOP:
     MOV AL, [SI]
-    CMP AL, 0DH              
+    CMP AL, 0DH              ; Kiểm tra kết thúc chuỗi
     JE COPY_DONE
-    CMP AL, ' '              
-    JE SKIP_CHAR             
+    CMP AL, ' '              ; Kiểm tra xem có phải ký tự trống không
+    JE SKIP_CHAR             ; Nếu là ký tự trống, bỏ qua           
     MOV [DI], AL
     INC DI
     INC CX
@@ -82,8 +82,10 @@ SKIP_CHAR:
     INC SI
     JMP COPY_LOOP
 COPY_DONE:
+; Kiểm tra nếu chỉ có 1 ký tự, không cần sắp xếp
     CMP CX, 1
     JLE SORT_DONE
+; Nếu có hơn 1 ký tự, tiến hành sắp xếp
     DEC CX
 OUTER_LOOP:
     LEA SI, sorted_str
@@ -101,6 +103,7 @@ NO_SWAP:
     JNZ INNER_LOOP
     LOOP OUTER_LOOP
 SORT_DONE:
+; Hiển thị chuỗi đã sắp xếp
     MOV AH, 09H
     LEA DX, MSG3
     INT 21H
